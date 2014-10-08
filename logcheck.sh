@@ -16,9 +16,10 @@
 DATE=`date +'%m.%d.%y'`
 #LOGDATE="[`date +'%a %b %d'`"
 MAX_LOGS=5 # Keep 5 days' worth
-EVIDENCE="\{\ \:\;\}\;"
+EVIDENCE="{ :;};"
 HOSTNAME=`hostname`
 FILENAME="$DATE.log"
+GREP=/bin/fgrep
 
 ######
 # Functions
@@ -46,6 +47,7 @@ function get_args
 	then
 		echo
 		echo "Usage: $0 -l <logfile location> -o <output location, or email address>\n"
+		exit
 	fi
 	
 	# Parse out command line flags and args
@@ -77,14 +79,14 @@ function extract_logs
 { # This part will scan the logs looking for BASH exploits, and record them in a file or email
 	if [ -z $OUTPUT ] #if the output variable is not set, then email logs
 	then
-		mailx -s "bash exploits found on `hostname`" `egrep $EVIDENCE $LOGFILE`
+		fgrep $EVIDENCE $LOGFILE |mailx -s "bash exploits found on `hostname` $EMAIL" 
 	else # $OUTPUT is defined, meaning that an email address was not found so it must be a filename
 		if [ -x $OUTPUT ] #if the directory doesn't exist, create it
 		then
 			mkdir -p $OUTPUT
 		fi
 		rotate_logs
-		egrep $EVIDENCE $LOGFILE >> "$OUTPUT/$FILENAME"
+		fgrep $EVIDENCE $LOGFILE >> "$OUTPUT/$FILENAME"
 	fi
 }
 
