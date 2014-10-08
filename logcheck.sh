@@ -13,6 +13,9 @@
 # [Ddd Mmm DD hh:mm:ss YYYY]
 # We're looking for "[Ddd Mmm DD" only
 
+# Debug mode
+set -x
+
 DATE=`date +'%m.%d.%y'`
 #LOGDATE="[`date +'%a %b %d'`"
 MAX_LOGS=5 # Keep 5 days' worth
@@ -20,6 +23,8 @@ EVIDENCE="{ :;};"
 HOSTNAME=`hostname`
 FILENAME="$DATE.log"
 GREP=/bin/fgrep
+ARGS=$#
+
 
 ######
 # Functions
@@ -27,7 +32,8 @@ GREP=/bin/fgrep
 
 function usage 
 {
-	echo "Usage: $0 -l <logfile location> -o <output location, or email address>\n"
+	echo "Usage: $0 -l <logfile location> -o <output location, or email address>"
+	echo
         exit 0
 }
 
@@ -43,10 +49,10 @@ function count_files
 
 function get_args
 { # Find out how we were invoked
-	if [ $# -ne "4" ] # if no arguments provided to the script
+	if [ $ARGS -lt "4" ] # if no arguments provided to the script
 	then
 		echo
-		echo "Usage: $0 -l <logfile location> -o <output location, or email address>\n"
+		echo "Usage: $0 -l <logfile location> -o <output location, or email address>"
 		exit
 	fi
 	
@@ -67,7 +73,7 @@ function get_args
 						OUTPUT="${OPTARG}/${HOSTNAME}/"
 				fi
 			;;
-			*) # Help requested
+			h|*) # Help requested
 				usage
 			;;
 		esac
