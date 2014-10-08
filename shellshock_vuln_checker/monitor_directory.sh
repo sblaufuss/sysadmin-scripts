@@ -7,8 +7,6 @@
 # location for logcheck.sh to use when it finds attempts to exploit Shellshock.
 # This script will alert me when it finds files in that directory.
 
-set -x
-
 LOG_DIRECTORY="/race_nas/bash_logs"
 FIND="/bin/find" 
 SUBJECT=("Attempted shellshock exploits found, please review the log directory.")
