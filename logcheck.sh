@@ -42,7 +42,7 @@ function count_files
 
 function get_args
 { # Find out how we were invoked
-	if [$# -lt 1] # if no arguments provided to the script
+	if [ $# -ne "4" ] # if no arguments provided to the script
 	then
 		echo
 		echo "Usage: $0 -l <logfile location> -o <output location, or email address>\n"
