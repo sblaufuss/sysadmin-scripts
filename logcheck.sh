@@ -14,35 +14,33 @@
 # We're looking for "[Ddd Mmm DD" only
 
 DATE=`date +'%m.%d.%y'`
-LOGDATE="[`date +'%a %b %d'`"
+#LOGDATE="[`date +'%a %b %d'`"
 MAX_LOGS=5 # Keep 5 days' worth
 EVIDENCE="\{\ \:\;\}\;"
 HOSTNAME=`hostname`
 FILENAME="$DATE.log"
-EFILES=0
-DFILES=0
 
 ######
 # Functions
 ######
 
-usage () 
+function usage 
 {
 	echo "Usage: $0 -l <logfile location> -o <output location, or email address>\n"
         exit 0
 }
 
-count_files ()
+function count_files 
 { # Used to count amount of existing files and how many we need to remove in the logrotate function
 	EFILES=`ls -tr $OUTPUT` # Create an array of filenames, sorted in order of oldest first
         NUM_FILES=${EFILES[@]} # $NUM_FILES is the number of files in the $OUTPUT directory, counted by
 # the array we created above. 
-        DFILES=(($NUM_FILES - $MAX_FILES)) # DFILES is the number of files we need to delete to have 
+        DFILES=$NUM_FILES - $MAX_FILES # DFILES is the number of files we need to delete to have 
 # $MAX_FILES amount of files in $OUTPUT. If EFILES has 7 files listed, then DFILES will be 2.
-	return 0;
+	return 0
 }
 
-get_args ()
+function get_args
 { # Find out how we were invoked
 	if [$# -lt 1] # if no arguments provided to the script
 	then
@@ -72,14 +70,14 @@ get_args ()
 			;;
 		esac
 	done
-	return 0;
+	return 0
 }
 
-extract_logs () 
+function extract_logs
 { # This part will scan the logs looking for BASH exploits, and record them in a file or email
 	if [ -z $OUTPUT ] #if the output variable is not set, then email logs
 	then
-		egrep $EVIDENCE $LOGFILE >> `mailx -s "bash exploits found on `hostname`" $EMAIL`
+		mailx -s "bash exploits found on `hostname`" `egrep $EVIDENCE $LOGFILE`
 	else # $OUTPUT is defined, meaning that an email address was not found so it must be a filename
 		if [ -x $OUTPUT ] #if the directory doesn't exist, create it
 		then
@@ -90,7 +88,7 @@ extract_logs ()
 	fi
 }
 
-rotate_logs ()
+function rotate_logs
 { 
 	count_files
 	if [ $DFILES -ge 0 ] 
@@ -110,9 +108,9 @@ rotate_logs ()
 		done
 	else
 		# Less than max amount of files present; go ahead and write one by returning to extract_logs.
-		return 0;
+		return 0
 	fi
-	return 1;
+	return 1
 }
 
 
